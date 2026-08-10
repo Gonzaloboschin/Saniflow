@@ -114,3 +114,54 @@ futuro que rompa este comportamiento se note enseguida corriendo
 - `ROADMAP.md`: las etapas que se charlaron (stock/insumos, cuenta
   corriente, roles de usuario, app para técnicos, facturación
   electrónica) puestas en orden con criterio de cuándo abordar cada una.
+
+---
+
+## Sesión 2 — Frontend
+
+### Qué se construyó
+Interfaz en **React + TypeScript + Vite**, en `frontend/`. Reemplaza al
+prototipo interactivo del principio (aquel vivía en el chat, con datos
+inventados) por pantallas reales conectadas al backend de la Sesión 1.
+
+### Decisión de stack (y qué se descartó)
+- **Vite** en vez de Next.js: no hay necesidad de server-side rendering
+  ni rutas de backend en el frontend (eso ya lo resuelve FastAPI). Vite
+  da un dev server rápido y un build simple para una SPA (single-page
+  app) común y corriente.
+- **TanStack Query** en vez de guardar los datos del servidor a mano con
+  `useState` + `useEffect`: se encarga solo de cachear, revalidar, y —lo
+  más importante en la práctica— de que cuando una pantalla cambia un
+  dato (ej. completar un trabajo), las otras pantallas que muestran ese
+  mismo dato se actualicen sin tener que escribir ese "avisale a los
+  demás" a mano. Eso es lo que hace `qc.invalidateQueries(...)` en los
+  formularios.
+- **Tailwind v4**: cambió bastante respecto a v3 (ya no se usa
+  `tailwind.config.js` de la misma forma, ahora los tokens de diseño
+  viven en el propio CSS con `@theme`). Se documenta acá porque si se
+  busca ayuda en internet, la mayoría de los tutoriales todavía muestran
+  la sintaxis vieja de v3 y confunde.
+
+### El punto flojo a vigilar: los tipos están duplicados a mano
+`frontend/src/types/index.ts` repite, en TypeScript, la forma de los
+schemas de Pydantic del backend (`ClienteOut`, `TrabajoOut`, etc.). Hoy
+se mantienen sincronizados a mano. **Esto se va a romper en algún
+momento** — alguien va a agregar un campo en el backend, olvidarse de
+actualizar el tipo del frontend, y el error va a aparecer recién en
+tiempo de ejecución (la propiedad llega `undefined`), no al compilar.
+Cuando eso empiece a doler, la solución estándar es generar estos tipos
+automáticamente desde `/openapi.json` (FastAPI lo expone solo, sin
+código extra) con una herramienta como `openapi-typescript`. No se hizo
+ahora porque para 8 entidades no vale la pena la complejidad extra
+todavía — pero si el modelo de datos crece bastante, revisar esto.
+
+### Cómo se verificó
+No alcanza con que compile: se levantó el backend contra Postgres real
+(con los datos del seed de la Sesión 1) y el frontend en paralelo, y se
+probó a mano por `curl` que el preflight de CORS responde bien para el
+origen `http://localhost:5173` y que el endpoint que usa la pantalla de
+Pendientes devuelve los trabajos reales. El chequeo de tipos (`tsc -b`)
+y el build de producción (`npm run build`) también se corrieron antes de
+entregar el código — encontraron 3 errores reales (tipos de Recharts,
+imports sin usar) que se corrigieron ahí mismo.
+
