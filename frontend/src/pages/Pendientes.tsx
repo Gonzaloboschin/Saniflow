@@ -8,24 +8,32 @@ import type { Trabajo } from "../types";
 import ServiceTag from "../components/ServiceTag";
 import Modal from "../components/Modal";
 import EmptyState from "../components/EmptyState";
+import ErrorState from "../components/ErrorState";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { useToast } from "../components/Toast";
 import { diffMin, hoyISO } from "../lib/format";
 
 export default function Pendientes() {
   const qc = useQueryClient();
   const [showNew, setShowNew] = useState(false);
   const [completando, setCompletando] = useState<Trabajo | null>(null);
+  const [cancelando, setCancelando] = useState<Trabajo | null>(null);
 
-  const { data: trabajos, isLoading } = useQuery({
+  const { data: trabajos, isLoading, isError, refetch } = useQuery({
     queryKey: ["trabajos", "pendiente"],
     queryFn: () => trabajosApi.listar("pendiente"),
   });
 
   const cancelar = useMutation({
     mutationFn: (id: number) => trabajosApi.cancelar(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["trabajos"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["trabajos"] });
+      setCancelando(null);
+    },
   });
 
   if (isLoading) return <div className="text-muted text-sm py-10 text-center">Cargando…</div>;
+  if (isError) return <ErrorState onRetry={() => refetch()} />;
 
   const hoy = hoyISO();
   const grupos = (trabajos ?? []).reduce<Record<string, Trabajo[]>>((acc, t) => {
@@ -61,7 +69,7 @@ export default function Pendientes() {
               {lista
                 .sort((a, b) => a.hora_programada.localeCompare(b.hora_programada))
                 .map((t) => (
-                  <JobCard key={t.id} trabajo={t} onComplete={() => setCompletando(t)} onCancel={() => cancelar.mutate(t.id)} />
+                  <JobCard key={t.id} trabajo={t} onComplete={() => setCompletando(t)} onCancel={() => setCancelando(t)} />
                 ))}
             </div>
           </div>
@@ -69,6 +77,16 @@ export default function Pendientes() {
 
       {showNew && <NewJobModal onClose={() => setShowNew(false)} />}
       {completando && <CompleteModal trabajo={completando} onClose={() => setCompletando(null)} />}
+      {cancelando && (
+        <ConfirmDialog
+          title="Cancelar visita"
+          message={`¿Seguro que querés cancelar la visita de "${cancelando.cliente_nombre}" programada para las ${cancelando.hora_programada.slice(0, 5)} hs? Esta acción no se puede deshacer.`}
+          confirmLabel="Sí, cancelar"
+          danger
+          onCancel={() => setCancelando(null)}
+          onConfirm={() => cancelar.mutate(cancelando.id)}
+        />
+      )}
     </div>
   );
 }
@@ -209,6 +227,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
 
 function CompleteModal({ trabajo, onClose }: { trabajo: Trabajo; onClose: () => void }) {
   const qc = useQueryClient();
+  const showToast = useToast();
   const [form, setForm] = useState<TrabajoCompletarPayload>({
     hora_inicio: trabajo.hora_programada.slice(0, 5),
     hora_fin: "",
@@ -229,8 +248,12 @@ function CompleteModal({ trabajo, onClose }: { trabajo: Trabajo; onClose: () => 
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       onClose();
       if (data.proximo_trabajo_generado) {
-        // eslint-disable-next-line no-alert
-        alert(`Se generó automáticamente el próximo trabajo para el ${data.proximo_trabajo_generado.fecha_programada} (contrato recurrente).`);
+        showToast(
+          `Trabajo confirmado. Como es un contrato recurrente, se agendó solo el próximo para el ${data.proximo_trabajo_generado.fecha_programada}.`,
+          "success"
+        );
+      } else {
+        showToast("Trabajo confirmado y movido a Realizados.", "success");
       }
     },
   });

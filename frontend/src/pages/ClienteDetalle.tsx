@@ -4,6 +4,7 @@ import { ArrowLeft, Phone, MapPin, Mail, DollarSign, ClipboardList, AlertTriangl
 import { clientesApi } from "../api/clientes";
 import ServiceTag from "../components/ServiceTag";
 import Kpi from "../components/Kpi";
+import ErrorState from "../components/ErrorState";
 import { fmtMoney, fmtFecha } from "../lib/format";
 
 const TIPO_INTERACCION_LABEL: Record<string, string> = {
@@ -14,11 +15,12 @@ export default function ClienteDetalle() {
   const { id } = useParams<{ id: string }>();
   const clienteId = Number(id);
 
-  const { data: cliente } = useQuery({ queryKey: ["cliente", clienteId], queryFn: () => clientesApi.obtener(clienteId) });
+  const { data: cliente, isError, refetch } = useQuery({ queryKey: ["cliente", clienteId], queryFn: () => clientesApi.obtener(clienteId) });
   const { data: historial } = useQuery({ queryKey: ["cliente", clienteId, "historial"], queryFn: () => clientesApi.historial(clienteId) });
   const { data: interacciones } = useQuery({ queryKey: ["cliente", clienteId, "interacciones"], queryFn: () => clientesApi.interacciones(clienteId) });
   const { data: problemas } = useQuery({ queryKey: ["cliente", clienteId, "problemas"], queryFn: () => clientesApi.problemasRecurrentes(clienteId) });
 
+  if (isError) return <ErrorState onRetry={() => refetch()} />;
   if (!cliente) return <div className="text-muted text-sm py-10 text-center">Cargando…</div>;
 
   return (

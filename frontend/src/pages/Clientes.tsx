@@ -4,15 +4,18 @@ import { Link } from "react-router-dom";
 import { Search, AlertTriangle, Users } from "lucide-react";
 import { clientesApi } from "../api/clientes";
 import EmptyState from "../components/EmptyState";
+import ErrorState from "../components/ErrorState";
 
 const TIPO_LABEL: Record<string, string> = { particular: "Particular", comercio: "Comercio", industria: "Industria" };
 
 export default function Clientes() {
   const [q, setQ] = useState("");
-  const { data: clientes, isLoading } = useQuery({ queryKey: ["clientes", q], queryFn: () => clientesApi.listar(q || undefined) });
+  const { data: clientes, isLoading, isError, refetch } = useQuery({ queryKey: ["clientes", q], queryFn: () => clientesApi.listar(q || undefined) });
   const { data: enRiesgo } = useQuery({ queryKey: ["clientes-en-riesgo"], queryFn: clientesApi.enRiesgo });
 
   const idsEnRiesgo = new Set((enRiesgo ?? []).map((r) => r.cliente_id));
+
+  if (isError) return <ErrorState onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">

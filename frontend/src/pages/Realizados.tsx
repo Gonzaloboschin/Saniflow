@@ -3,15 +3,17 @@ import { CheckCircle2 } from "lucide-react";
 import { trabajosApi } from "../api/trabajos";
 import ServiceTag from "../components/ServiceTag";
 import EmptyState from "../components/EmptyState";
+import ErrorState from "../components/ErrorState";
 import { fmtMoney, fmtFecha } from "../lib/format";
 
 export default function Realizados() {
-  const { data: trabajos, isLoading } = useQuery({
+  const { data: trabajos, isLoading, isError, refetch } = useQuery({
     queryKey: ["trabajos", "realizado"],
     queryFn: () => trabajosApi.listar("realizado"),
   });
 
   if (isLoading) return <div className="text-muted text-sm py-10 text-center">Cargando…</div>;
+  if (isError) return <ErrorState onRetry={() => refetch()} />;
 
   if (!trabajos || trabajos.length === 0) {
     return <EmptyState icon={CheckCircle2} title="Todavía no hay trabajos realizados." />;

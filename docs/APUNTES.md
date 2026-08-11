@@ -165,3 +165,65 @@ y el build de producción (`npm run build`) también se corrieron antes de
 entregar el código — encontraron 3 errores reales (tipos de Recharts,
 imports sin usar) que se corrigieron ahí mismo.
 
+---
+
+## Sesión 3 — Revisión crítica y correcciones
+
+### Qué se corrigió
+Revisión de UX/frontend con ojo crítico (no solo "¿compila?", sino "¿qué
+pasa cuando algo sale mal, o cuando alguien toca donde no quería?"). Se
+arreglaron 3 cosas:
+
+1. **Las pantallas no distinguían "no hay datos" de "no pude conectarme
+   al backend".** Antes, si la API estaba caída, `Pendientes`/`Clientes`/
+   `Realizados`/la ficha de cliente mostraban el mismo mensaje que si
+   realmente no hubiera nada cargado — lo cual es directamente engañoso
+   (parece "no tenés visitas hoy" cuando en realidad el sistema no
+   respondió). Se agregó manejo de `isError` en cada pantalla, con un
+   componente nuevo `ErrorState` que además ofrece un botón de
+   "Reintentar" (`refetch()` de TanStack Query).
+
+2. **Cancelar una visita era de un solo toque, sin vuelta atrás.** Se
+   agregó `ConfirmDialog`, un componente genérico de confirmación
+   (reutilizable para cualquier acción destructiva futura), y ahora
+   cancelar pide confirmar antes de ejecutar la mutación.
+
+3. **Se reemplazó el `alert()` nativo del navegador** (que se usaba para
+   avisar que se generó automáticamente el próximo trabajo de un
+   contrato) **por un sistema de notificaciones propio** (`Toast.tsx`,
+   con contexto de React vía `useToast()`). Queda estilado acorde al
+   resto de la app y no bloquea la interacción como sí hace `alert()`.
+
+De paso, se corrigieron dos detalles menores: el título de la pestaña
+del navegador (quedó "frontend", el default de Vite) y el `lang="en"`
+del HTML (debía ser `"es"`).
+
+### Deuda de UX reconocida, para más adelante (no se tocó todavía)
+- Sin favicon propio (sigue el de Vite).
+- Estados de carga son texto plano ("Cargando…"), sin esqueleto.
+- `Realizados` no tiene filtros ni paginación — con meses de uso real
+  esa tabla va a volverse difícil de navegar.
+- El Dashboard no compara contra el período anterior (ej. "+12% vs mes
+  pasado"), que es el tipo de dato que más ayuda a decidir.
+- Contraste de color un poco bajo en textos secundarios (`text-muted`
+  sobre blanco, en mayúsculas chiquitas) — revisar accesibilidad si en
+  algún momento el dueño lo usa mucho tiempo seguido en el celular.
+
+### Backlog funcional anotado (todavía no diseñado ni implementado)
+**Separar los trabajos en "Eventuales" y "Fijos".** Idea: un trabajo
+"Fijo" es el que nace de un contrato con frecuencia periódica (los que
+ya generan su propio "próximo trabajo" automáticamente al completarse);
+un trabajo "Eventual" es el de un cliente que llama una sola vez, sin
+contrato detrás (una casa, un comercio puntual). Hoy el modelo de datos
+ya distingue esto de forma implícita —`trabajo.contrato_id` es `null` en
+los eventuales, y tiene valor en los fijos— pero no está expuesto en la
+interfaz como una categoría visible. Cuando se aborde, pensar si
+conviene:
+(a) simplemente agregar un filtro/tab en `Pendientes` y `Realizados`
+    que separe por `contrato_id != null`, sin tocar el modelo de datos, o
+(b) sumar un campo explícito `tipo_trabajo` en el backend si con el
+    tiempo aparecen reglas de negocio distintas para cada categoría
+    (ej. prioridad automática, recordatorios distintos, tarifas base
+    diferentes) que no se puedan resolver solo mirando si hay contrato.
+La opción (a) es más simple y probablemente alcance al principio.
+
