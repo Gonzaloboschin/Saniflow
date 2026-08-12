@@ -4,20 +4,24 @@ import { Clock, User, CheckCircle2, X, Plus, AlertTriangle, CalendarDays, Clipbo
 import { trabajosApi, type TrabajoCreatePayload, type TrabajoCompletarPayload } from "../api/trabajos";
 import { clientesApi } from "../api/clientes";
 import { serviciosApi, tecnicosApi } from "../api/servicios";
+import { contratosApi } from "../api/contratos";
 import type { Trabajo } from "../types";
 import ServiceTag from "../components/ServiceTag";
+import TipoTrabajoTag from "../components/TipoTrabajoTag";
+import TipoTrabajoFilter, { type FiltroTipoTrabajo } from "../components/TipoTrabajoFilter";
 import Modal from "../components/Modal";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useToast } from "../components/Toast";
-import { diffMin, hoyISO } from "../lib/format";
+import { diffMin, hoyISO, FRECUENCIA_LABEL } from "../lib/format";
 
 export default function Pendientes() {
   const qc = useQueryClient();
   const [showNew, setShowNew] = useState(false);
   const [completando, setCompletando] = useState<Trabajo | null>(null);
   const [cancelando, setCancelando] = useState<Trabajo | null>(null);
+  const [filtroTipo, setFiltroTipo] = useState<FiltroTipoTrabajo>("todos");
 
   const { data: trabajos, isLoading, isError, refetch } = useQuery({
     queryKey: ["trabajos", "pendiente"],
@@ -36,14 +40,20 @@ export default function Pendientes() {
   if (isError) return <ErrorState onRetry={() => refetch()} />;
 
   const hoy = hoyISO();
-  const grupos = (trabajos ?? []).reduce<Record<string, Trabajo[]>>((acc, t) => {
+  const filtrados = (trabajos ?? []).filter((t) => {
+    if (filtroTipo === "eventual") return t.contrato_id == null;
+    if (filtroTipo === "fijo") return t.contrato_id != null;
+    return true;
+  });
+  const grupos = filtrados.reduce<Record<string, Trabajo[]>>((acc, t) => {
     (acc[t.fecha_programada] ??= []).push(t);
     return acc;
   }, {});
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center flex-wrap gap-3">
+        <TipoTrabajoFilter value={filtroTipo} onChange={setFiltroTipo} />
         <button
           onClick={() => setShowNew(true)}
           className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-md text-white bg-primary transition-transform hover:scale-[1.03]"
@@ -53,7 +63,11 @@ export default function Pendientes() {
       </div>
 
       {Object.keys(grupos).length === 0 && (
-        <EmptyState icon={ClipboardList} title="No hay visitas pendientes." subtitle="Cargá un nuevo trabajo para verlo acá." />
+        <EmptyState
+          icon={ClipboardList}
+          title={filtroTipo === "todos" ? "No hay visitas pendientes." : "No hay visitas pendientes de este tipo."}
+          subtitle="Cargá un nuevo trabajo para verlo acá."
+        />
       )}
 
       {Object.entries(grupos)
@@ -110,7 +124,10 @@ function JobCard({ trabajo, onComplete, onCancel }: { trabajo: Trabajo; onComple
             )}
           </div>
 
-          <ServiceTag nombre={trabajo.servicio_nombre} color={trabajo.servicio_color} />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <ServiceTag nombre={trabajo.servicio_nombre} color={trabajo.servicio_color} />
+            <TipoTrabajoTag contratoId={trabajo.contrato_id} />
+          </div>
 
           <div className="mt-3 space-y-1.5 text-sm text-[#4B5B54]">
             <div className="flex items-center gap-2">
@@ -156,6 +173,13 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
     cliente_id: 0, servicio_id: 0, fecha_programada: hoyISO(), hora_programada: "09:00", prioridad: "normal",
   });
 
+  const { data: contratosCliente } = useQuery({
+    queryKey: ["contratos", form.cliente_id],
+    queryFn: () => contratosApi.porCliente(form.cliente_id),
+    enabled: form.cliente_id > 0,
+  });
+  const contratosActivos = (contratosCliente ?? []).filter((c) => c.activo);
+
   const crear = useMutation({
     mutationFn: () => trabajosApi.crear(form),
     onSuccess: () => {
@@ -171,10 +195,33 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
       <div className="space-y-3">
         <label className="block">
           <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Cliente</span>
-          <select className={inputCls} value={form.cliente_id} onChange={(e) => setForm({ ...form, cliente_id: Number(e.target.value) })}>
+          <select
+            className={inputCls}
+            value={form.cliente_id}
+            onChange={(e) => setForm({ ...form, cliente_id: Number(e.target.value), contrato_id: null })}
+          >
             <option value={0}>Seleccionar…</option>
             {clientes?.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
           </select>
+        </label>
+        <label className="block">
+          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Tipo de trabajo</span>
+          <select
+            className={inputCls}
+            value={form.contrato_id ?? 0}
+            disabled={form.cliente_id === 0}
+            onChange={(e) => setForm({ ...form, contrato_id: Number(e.target.value) || null })}
+          >
+            <option value={0}>Eventual (sin contrato)</option>
+            {contratosActivos.map((c) => (
+              <option key={c.id} value={c.id}>
+                Fijo — contrato #{c.id} ({FRECUENCIA_LABEL[c.frecuencia]})
+              </option>
+            ))}
+          </select>
+          {form.cliente_id > 0 && contratosActivos.length === 0 && (
+            <p className="text-xs text-muted mt-1">Este cliente no tiene contratos activos — solo puede ser eventual.</p>
+          )}
         </label>
         <label className="block">
           <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Tipo de servicio</span>

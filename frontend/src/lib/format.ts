@@ -19,3 +19,13 @@ export const hoyISO = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
+
+export const FRECUENCIA_LABEL: Record<string, string> = {
+  semanal: "Semanal",
+  quincenal: "Quincenal",
+  mensual: "Mensual",
+  trimestral: "Trimestral",
+  semestral: "Semestral",
+  anual: "Anual",
+  a_demanda: "A demanda",
+};

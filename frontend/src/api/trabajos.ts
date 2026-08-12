@@ -5,6 +5,7 @@ export interface TrabajoCreatePayload {
   cliente_id: number;
   servicio_id: number;
   tecnico_id?: number | null;
+  contrato_id?: number | null;
   fecha_programada: string;
   hora_programada: string;
   prioridad?: "normal" | "urgente";

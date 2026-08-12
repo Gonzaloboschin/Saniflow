@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Phone, MapPin, Mail, DollarSign, ClipboardList, AlertTriangle, MessageSquare, Repeat } from "lucide-react";
 import { clientesApi } from "../api/clientes";
 import ServiceTag from "../components/ServiceTag";
+import TipoTrabajoTag from "../components/TipoTrabajoTag";
 import Kpi from "../components/Kpi";
 import ErrorState from "../components/ErrorState";
 import { fmtMoney, fmtFecha } from "../lib/format";
@@ -80,6 +81,7 @@ export default function ClienteDetalle() {
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="mono text-[11px] font-bold text-primary shrink-0">{t.codigo}</span>
                   <ServiceTag nombre={t.servicio_nombre} color={t.servicio_color} />
+                  <TipoTrabajoTag contratoId={t.contrato_id} />
                   <span className="text-xs text-muted shrink-0">
                     {t.estado === "realizado" ? fmtFecha(t.fecha_realizado) : `Programado ${fmtFecha(t.fecha_programada)}`}
                   </span>
