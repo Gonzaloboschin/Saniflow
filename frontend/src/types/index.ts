@@ -117,6 +117,16 @@ export interface KpisDashboard {
   margen_pct: number;
   ticket_promedio: number;
   duracion_promedio_min: number;
+  trabajos_eventuales: number;
+  trabajos_fijos: number;
+  facturacion_eventual: number;
+  facturacion_fija: number;
+  ticket_promedio_eventual: number;
+  ticket_promedio_fijo: number;
+  pct_ingresos_fijos: number;
+  trabajos_cancelados: number;
+  trabajos_programados_periodo: number;
+  pct_cancelados: number;
 }
 
 export interface PorServicio {

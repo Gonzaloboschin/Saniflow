@@ -227,3 +227,80 @@ conviene:
     diferentes) que no se puedan resolver solo mirando si hay contrato.
 La opción (a) es más simple y probablemente alcance al principio.
 
+---
+
+## Sesión 4 — Eventuales vs. Fijos
+
+### Qué se implementó
+Se retomó el backlog de la Sesión 3: distinguir visualmente trabajos
+"Eventuales" (sin contrato detrás — un cliente que llama una sola vez)
+de "Fijos" (nacen de un `Contrato` con frecuencia periódica). Se optó
+por la **opción (a)** que se había dejado anotada: nada de modelo de
+datos nuevo, todo resuelto con lo que ya existía.
+
+- El campo `contrato_id` en `Trabajo` ya distinguía esto de forma
+  implícita desde el principio — no hizo falta tocar el backend en
+  absoluto. Toda la funcionalidad quedó del lado del frontend.
+- Se agregó un filtro (`Todos / Eventuales / Fijos`) en `Pendientes` y
+  `Realizados`, y una etiqueta visual (`TipoTrabajoTag`) en cada
+  tarjeta, fila de tabla, y entrada del historial de la ficha de
+  cliente.
+- **El cambio más importante no es visual, es funcional**: hasta ahora
+  un trabajo "Fijo" solo podía nacer automáticamente (al completar un
+  trabajo de contrato, el backend generaba el próximo). No había forma
+  de crear uno a mano vinculado a un contrato desde la interfaz. Se
+  agregó ese selector al formulario de "Nuevo trabajo" — al elegir un
+  cliente, se consultan sus contratos activos (`GET
+  /contratos/cliente/{id}`, que ya existía en el backend) y se puede
+  elegir vincular el trabajo nuevo a uno de ellos. Esto importa porque
+  un trabajo creado así, al completarse, **va a disparar la misma
+  lógica de auto-generación del próximo** que ya probamos en la Sesión
+  1 — no es solo un rótulo, cambia el comportamiento real.
+
+### Nota sobre el sandbox, no sobre el código
+Durante esta sesión el build de producción falló dos veces con "Bus
+error" — no era un bug del código (el chequeo de tipos con `tsc
+--noEmit` ya daba limpio antes de eso). Era un binario de `esbuild`
+corrupto en el entorno de pruebas, arrastrado de una caída anterior del
+sandbox. Se resolvió reinstalando `node_modules` desde cero. Se anota
+acá porque, si en algún momento en tu propia máquina un build falla con
+un error que no tiene nada que ver con el código (`Bus error`,
+`Segmentation fault`, binarios que "no existen" de la nada), el primer
+diagnóstico razonable —antes de sospechar del código— es borrar
+`node_modules` y reinstalar.
+
+---
+
+## Sesión 5 — Métricas de Eventuales/Fijos y cancelaciones
+
+### Qué se agregó
+Se extendió `GET /dashboard/kpis` (no se creó un endpoint nuevo, para no
+sumar otro round-trip HTTP) con:
+- Cantidad y facturación de trabajos eventuales vs. fijos, y el ticket
+  promedio de cada uno.
+- `pct_ingresos_fijos`: qué porcentaje de lo facturado en el período
+  viene de contratos recurrentes. Es la métrica que más importa de las
+  nuevas — un negocio con alto % de ingresos fijos es más predecible y
+  vale más (menos dependencia de conseguir clientes nuevos cada mes).
+- Cantidad y % de trabajos cancelados.
+
+### Decisión de diseño: cómo se define el "total" para el % de cancelados
+Ojo con esto si se lo toca en el futuro: el porcentaje de cancelados
+**no** se calcula sobre todos los trabajos que existen, sino sobre los
+que tuvieron un desenlace en el período (`realizado` + `cancelado`, con
+`fecha_programada` dentro del rango). Un trabajo todavía `pendiente` no
+cuenta ni a favor ni en contra — todavía no se sabe qué va a pasar con
+él. Si se contara sobre el total de trabajos sin filtrar por estado, el
+% de cancelados bajaría artificialmente a medida que se cargan más
+visitas futuras, lo cual sería engañoso.
+
+### Cómo se verificó
+Se agregó `backend/tests/test_dashboard.py` con dos tests que arman
+datos controlados (ej: un trabajo eventual de $10.000 y uno fijo de
+$20.000) y verifican los números exactos devueltos (66.7% de ingresos
+fijos, 50% de cancelación con el pendiente correctamente excluido) — no
+alcanza con "corrió sin error", se verificó que el cálculo da lo que
+matemáticamente tiene que dar. Además se probó contra los datos reales
+del seed vía `curl`, para confirmar que con datos "de la vida real" (no
+solo los inventados para el test) los números también tienen sentido.
+

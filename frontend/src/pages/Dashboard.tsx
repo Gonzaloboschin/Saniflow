@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { ClipboardList, DollarSign, TrendingUp, Clock } from "lucide-react";
+import { ClipboardList, DollarSign, TrendingUp, Clock, Repeat, Users, XCircle } from "lucide-react";
 import { dashboardApi } from "../api/dashboard";
 import Kpi from "../components/Kpi";
 import { fmtMoney } from "../lib/format";
@@ -45,6 +45,56 @@ export default function Dashboard() {
           <Kpi icon={DollarSign} label="Facturación" value={fmtMoney(kpis.facturacion)} accent="#0F5C56" />
           <Kpi icon={TrendingUp} label="Ganancia neta" value={fmtMoney(kpis.ganancia_neta)} accent="#2F9E6E" sub={`${kpis.margen_pct.toFixed(0)}% margen`} />
           <Kpi icon={Clock} label="Duración promedio" value={`${Math.round(kpis.duracion_promedio_min)} min`} />
+        </div>
+      )}
+
+      {kpis && (
+        <div className="space-y-3">
+          <h3 className="font-bold text-sm text-ink">Eventuales vs. Fijos</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Kpi icon={Users} label="Trabajos eventuales" value={kpis.trabajos_eventuales} />
+            <Kpi icon={Repeat} label="Trabajos fijos" value={kpis.trabajos_fijos} accent="#0F5C56" />
+            <Kpi
+              icon={TrendingUp}
+              label="Ingresos recurrentes"
+              value={`${kpis.pct_ingresos_fijos.toFixed(0)}%`}
+              accent="#2F9E6E"
+              sub="del total facturado, viene de contratos fijos"
+            />
+            <Kpi
+              icon={XCircle}
+              label="Cancelaciones"
+              value={kpis.trabajos_cancelados}
+              accent={kpis.trabajos_cancelados > 0 ? "#C2542B" : "#16241F"}
+              sub={
+                kpis.trabajos_programados_periodo > 0
+                  ? `${kpis.pct_cancelados.toFixed(0)}% de lo agendado en el período`
+                  : "sin visitas agendadas todavía"
+              }
+            />
+          </div>
+
+          {(kpis.trabajos_eventuales > 0 || kpis.trabajos_fijos > 0) && (
+            <div className="bg-white rounded-lg border border-border p-4">
+              <h4 className="font-bold text-sm mb-3 text-ink">Facturación y ticket promedio por tipo</h4>
+              <div className="space-y-3">
+                <TipoBarRow
+                  label="Eventuales"
+                  facturacion={kpis.facturacion_eventual}
+                  ticket={kpis.ticket_promedio_eventual}
+                  max={Math.max(kpis.facturacion_eventual, kpis.facturacion_fija) || 1}
+                  color="#8CA39A"
+                />
+                <TipoBarRow
+                  label="Fijos"
+                  facturacion={kpis.facturacion_fija}
+                  ticket={kpis.ticket_promedio_fijo}
+                  max={Math.max(kpis.facturacion_eventual, kpis.facturacion_fija) || 1}
+                  color="#0F5C56"
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -113,4 +163,24 @@ export default function Dashboard() {
 
 function EmptyChart() {
   return <div className="h-[240px] flex items-center justify-center text-sm text-faint">Sin datos en este período todavía.</div>;
+}
+
+function TipoBarRow({
+  label, facturacion, ticket, max, color,
+}: {
+  label: string; facturacion: number; ticket: number; max: number; color: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+      <div className="w-20 text-sm font-semibold shrink-0 text-ink">{label}</div>
+      <div className="flex-1 min-w-[80px] h-2 rounded-full bg-[#EEF2F0]">
+        <div
+          className="h-2 rounded-full transition-all"
+          style={{ width: `${Math.min(100, (facturacion / max) * 100)}%`, background: color }}
+        />
+      </div>
+      <div className="text-sm font-semibold w-24 text-right shrink-0 text-ink">{fmtMoney(facturacion)}</div>
+      <div className="text-xs mono shrink-0 text-muted">ticket prom. {fmtMoney(ticket)}</div>
+    </div>
+  );
 }

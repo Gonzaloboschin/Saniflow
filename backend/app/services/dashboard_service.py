@@ -36,6 +36,26 @@ def kpis(db: Session, periodo: str) -> dict:
     costo = float(costo)
     ganancia = revenue - costo
 
+    # Eventual = sin contrato detrás; Fijo = nace de un contrato con frecuencia periódica.
+    eventual_q = base.filter(Trabajo.contrato_id.is_(None))
+    fijo_q = base.filter(Trabajo.contrato_id.isnot(None))
+
+    n_eventual = eventual_q.count()
+    n_fijo = fijo_q.count()
+    rev_eventual = float(eventual_q.with_entities(func.coalesce(func.sum(Trabajo.monto), 0)).scalar() or 0)
+    rev_fijo = float(fijo_q.with_entities(func.coalesce(func.sum(Trabajo.monto), 0)).scalar() or 0)
+
+    # Cancelaciones: sobre lo agendado en el período (realizado o cancelado, con
+    # fecha_programada en el rango) — un pendiente todavía no tiene desenlace,
+    # no cuenta ni como éxito ni como cancelación.
+    programados_q = db.query(Trabajo).filter(
+        Trabajo.fecha_programada >= desde,
+        Trabajo.fecha_programada <= hasta,
+        Trabajo.estado.in_([EstadoTrabajo.realizado, EstadoTrabajo.cancelado]),
+    )
+    total_programados = programados_q.count()
+    cancelados = programados_q.filter(Trabajo.estado == EstadoTrabajo.cancelado).count()
+
     return {
         "periodo": periodo,
         "desde": desde,
@@ -47,6 +67,16 @@ def kpis(db: Session, periodo: str) -> dict:
         "margen_pct": (ganancia / revenue * 100) if revenue else 0,
         "ticket_promedio": (revenue / n) if n else 0,
         "duracion_promedio_min": float(duracion_prom),
+        "trabajos_eventuales": n_eventual,
+        "trabajos_fijos": n_fijo,
+        "facturacion_eventual": rev_eventual,
+        "facturacion_fija": rev_fijo,
+        "ticket_promedio_eventual": (rev_eventual / n_eventual) if n_eventual else 0,
+        "ticket_promedio_fijo": (rev_fijo / n_fijo) if n_fijo else 0,
+        "pct_ingresos_fijos": (rev_fijo / revenue * 100) if revenue else 0,
+        "trabajos_cancelados": cancelados,
+        "trabajos_programados_periodo": total_programados,
+        "pct_cancelados": (cancelados / total_programados * 100) if total_programados else 0,
     }
 
 
