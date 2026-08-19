@@ -28,7 +28,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`flex items-start gap-2 rounded-lg border px-4 py-3 shadow-lg text-sm bg-white ${
+            className={`flex items-start gap-2 rounded-lg border px-4 py-3 shadow-lg text-sm bg-card ${
               t.type === "success" ? "border-success/30" : t.type === "error" ? "border-warn/30" : "border-border"
             }`}
           >

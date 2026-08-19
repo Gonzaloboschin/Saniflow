@@ -1,25 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-display: 'Fraunces', 'Georgia', serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --color-ink: #16241F;
-  --color-surface: #F5F8F6;
-  --color-primary: #0F5C56;
-  --color-primary-dark: #0B4440;
-  --color-border: #E4EAE7;
-  --color-muted: #7A8B84;
-  --color-faint: #8CA39A;
-  --color-warn: #C2542B;
-  --color-success: #2F9E6E;
+  /* Cálido y cercano: terracota + arena, en vez del verde-azulado frío original */
+  --color-ink: #362A22;           /* texto principal, marrón carbón cálido */
+  --color-ink-soft: #5B4A3D;      /* texto secundario */
+  --color-surface: #FAF5EE;       /* fondo general, crema */
+  --color-surface-alt: #F1E7DA;   /* fondo de hover/filas alternadas */
+  --color-card: #FFFFFF;
+
+  --color-primary: #BD5A38;       /* terracota, color de marca/acción */
+  --color-primary-dark: #9A4529;
+  --color-primary-soft: #F3E1D8;  /* fondo suave del acento, para chips/hover */
+
+  --color-border: #E9DCCC;
+  --color-muted: #8A7A6C;         /* texto apagado */
+  --color-faint: #B9A997;         /* íconos/detalles muy sutiles */
+  --color-divider: #DCCBB8;
+
+  --color-warn: #A8402E;          /* rojo cálido, distinto del terracota primario */
+  --color-warn-soft: #F5E0D9;
+  --color-success: #6F8F57;       /* verde salvia, cálido */
+  --color-success-soft: #E7EDDF;
 }
 
 body {
   font-family: var(--font-sans);
   background: var(--color-surface);
   color: var(--color-ink);
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
 
 .mono {

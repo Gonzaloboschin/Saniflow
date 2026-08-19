@@ -106,9 +106,9 @@ export default function Pendientes() {
 }
 
 function JobCard({ trabajo, onComplete, onCancel }: { trabajo: Trabajo; onComplete: () => void; onCancel: () => void }) {
-  const color = trabajo.servicio_color || "#0F5C56";
+  const color = trabajo.servicio_color || "#BD5A38";
   return (
-    <div className="ticket bg-white rounded-lg border overflow-hidden border-border">
+    <div className="ticket bg-card rounded-lg border overflow-hidden border-border">
       <div className="flex">
         <div className="w-1.5 shrink-0" style={{ background: color }} />
         <div className="flex-1 p-4">
@@ -118,7 +118,7 @@ function JobCard({ trabajo, onComplete, onCancel }: { trabajo: Trabajo; onComple
               <div className="font-bold text-[15px] text-ink">{trabajo.cliente_nombre}</div>
             </div>
             {trabajo.prioridad === "urgente" && (
-              <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FBEAE3] text-warn">
+              <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#F5E0D9] text-warn">
                 <AlertTriangle size={11} /> Urgente
               </span>
             )}
@@ -129,13 +129,13 @@ function JobCard({ trabajo, onComplete, onCancel }: { trabajo: Trabajo; onComple
             <TipoTrabajoTag contratoId={trabajo.contrato_id} />
           </div>
 
-          <div className="mt-3 space-y-1.5 text-sm text-[#4B5B54]">
+          <div className="mt-3 space-y-1.5 text-sm text-[#5B4A3D]">
             <div className="flex items-center gap-2">
               <Clock size={14} className="shrink-0 text-faint" />
               {trabajo.hora_programada.slice(0, 5)} hs
               {trabajo.tecnico_nombre && (
                 <>
-                  <span className="mx-1 text-[#C7D2CC]">·</span>
+                  <span className="mx-1 text-[#DCCBB8]">·</span>
                   <User size={14} className="shrink-0 text-faint" />
                   {trabajo.tecnico_nombre}
                 </>
@@ -194,7 +194,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
     <Modal title="Nuevo trabajo" onClose={onClose}>
       <div className="space-y-3">
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Cliente</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Cliente</span>
           <select
             className={inputCls}
             value={form.cliente_id}
@@ -205,7 +205,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
           </select>
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Tipo de trabajo</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Tipo de trabajo</span>
           <select
             className={inputCls}
             value={form.contrato_id ?? 0}
@@ -224,7 +224,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
           )}
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Tipo de servicio</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Tipo de servicio</span>
           <select className={inputCls} value={form.servicio_id} onChange={(e) => setForm({ ...form, servicio_id: Number(e.target.value) })}>
             <option value={0}>Seleccionar…</option>
             {servicios?.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}
@@ -232,30 +232,30 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
         </label>
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Fecha</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Fecha</span>
             <input type="date" className={inputCls} value={form.fecha_programada} onChange={(e) => setForm({ ...form, fecha_programada: e.target.value })} />
           </label>
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Hora</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Hora</span>
             <input type="time" className={inputCls} value={form.hora_programada} onChange={(e) => setForm({ ...form, hora_programada: e.target.value })} />
           </label>
         </div>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Técnico</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Técnico</span>
           <select className={inputCls} value={form.tecnico_id ?? 0} onChange={(e) => setForm({ ...form, tecnico_id: Number(e.target.value) || undefined })}>
             <option value={0}>Sin asignar</option>
             {tecnicos?.map((t) => <option key={t.id} value={t.id}>{t.nombre}</option>)}
           </select>
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Prioridad</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Prioridad</span>
           <select className={inputCls} value={form.prioridad} onChange={(e) => setForm({ ...form, prioridad: e.target.value as "normal" | "urgente" })}>
             <option value="normal">Normal</option>
             <option value="urgente">Urgente</option>
           </select>
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Notas (opcional)</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Notas (opcional)</span>
           <textarea className={inputCls} rows={2} value={form.notas ?? ""} onChange={(e) => setForm({ ...form, notas: e.target.value })} />
         </label>
 
@@ -316,11 +316,11 @@ function CompleteModal({ trabajo, onClose }: { trabajo: Trabajo; onClose: () => 
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Hora de inicio</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Hora de inicio</span>
             <input type="time" className={inputCls} value={form.hora_inicio} onChange={(e) => setForm({ ...form, hora_inicio: e.target.value })} />
           </label>
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Hora de fin</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Hora de fin</span>
             <input type="time" className={inputCls} value={form.hora_fin} onChange={(e) => setForm({ ...form, hora_fin: e.target.value })} />
           </label>
         </div>
@@ -329,20 +329,20 @@ function CompleteModal({ trabajo, onClose }: { trabajo: Trabajo; onClose: () => 
         )}
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Monto cobrado ($)</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Monto cobrado ($)</span>
             <input type="number" className={inputCls} value={form.monto || ""} onChange={(e) => setForm({ ...form, monto: Number(e.target.value) })} />
           </label>
           <label className="block">
-            <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Costo del servicio ($)</span>
+            <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Costo del servicio ($)</span>
             <input type="number" className={inputCls} value={form.costo || ""} onChange={(e) => setForm({ ...form, costo: Number(e.target.value) })} />
           </label>
         </div>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Detalle del trabajo realizado</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Detalle del trabajo realizado</span>
           <textarea className={inputCls} rows={3} value={form.detalle_trabajo} onChange={(e) => setForm({ ...form, detalle_trabajo: e.target.value })} placeholder="Producto aplicado, zonas tratadas, observaciones…" />
         </label>
         <label className="block">
-          <span className="block text-xs font-semibold mb-1 text-[#4B5B54]">Etiquetas (opcional, separadas por coma)</span>
+          <span className="block text-xs font-semibold mb-1 text-[#5B4A3D]">Etiquetas (opcional, separadas por coma)</span>
           <input className={inputCls} value={etiquetasTexto} onChange={(e) => setEtiquetasTexto(e.target.value)} placeholder="ej: reaparición cucarachas, acceso difícil" />
         </label>
 

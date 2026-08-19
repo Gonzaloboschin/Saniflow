@@ -13,14 +13,14 @@ export default function Modal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: "#16241F80" }}
+      style={{ background: "#362A2240" }}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b sticky top-0 bg-white border-border">
+        <div className="flex items-center justify-between px-5 py-4 border-b sticky top-0 bg-card border-border">
           <h3 className="font-bold text-[15px] text-ink">{title}</h3>
           <button onClick={onClose} className="text-faint hover:text-ink">
             <X size={18} />

@@ -17,7 +17,7 @@ export default function ConfirmDialog({
 }) {
   return (
     <Modal title={title} onClose={onCancel}>
-      <p className="text-sm text-[#4B5B54] mb-5">{message}</p>
+      <p className="text-sm text-[#5B4A3D] mb-5">{message}</p>
       <div className="flex gap-2">
         <button
           onClick={onCancel}

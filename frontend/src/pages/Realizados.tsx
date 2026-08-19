@@ -40,7 +40,7 @@ export default function Realizados() {
           }
         />
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden border-border">
+        <div className="bg-card rounded-lg border overflow-hidden border-border">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -59,17 +59,17 @@ export default function Realizados() {
               </thead>
               <tbody>
                 {filtrados.map((t) => (
-                  <tr key={t.id} className="border-t border-[#EEF2F0]">
+                  <tr key={t.id} className="border-t border-[#F1E7DA]">
                     <td className="px-4 py-3 mono text-[12px] font-semibold text-primary">{t.codigo}</td>
                     <td className="px-4 py-3 font-semibold text-ink">{t.cliente_nombre}</td>
                     <td className="px-4 py-3"><ServiceTag nombre={t.servicio_nombre} color={t.servicio_color} /></td>
                     <td className="px-4 py-3"><TipoTrabajoTag contratoId={t.contrato_id} /></td>
-                    <td className="px-4 py-3 text-[#4B5B54]">{fmtFecha(t.fecha_realizado)}</td>
-                    <td className="px-4 py-3 text-[#4B5B54]">{t.duracion_min} min</td>
+                    <td className="px-4 py-3 text-[#5B4A3D]">{fmtFecha(t.fecha_realizado)}</td>
+                    <td className="px-4 py-3 text-[#5B4A3D]">{t.duracion_min} min</td>
                     <td className="px-4 py-3 font-semibold text-ink">{fmtMoney(t.monto)}</td>
                     <td className="px-4 py-3 text-warn">{fmtMoney(t.costo)}</td>
                     <td className="px-4 py-3 font-semibold text-success">{fmtMoney((t.monto ?? 0) - (t.costo ?? 0))}</td>
-                    <td className="px-4 py-3 text-[#4B5B54]">{t.tecnico_nombre ?? "-"}</td>
+                    <td className="px-4 py-3 text-[#5B4A3D]">{t.tecnico_nombre ?? "-"}</td>
                   </tr>
                 ))}
               </tbody>

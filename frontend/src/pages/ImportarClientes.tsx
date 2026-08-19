@@ -8,10 +8,10 @@ import { importacionApi, type FilaImportacionPreview } from "../api/importacion"
 import { useToast } from "../components/Toast";
 
 const ESTADO_INFO: Record<string, { icon: typeof CheckCircle2; color: string; bg: string; label: string }> = {
-  ok: { icon: CheckCircle2, color: "#2F9E6E", bg: "#E9F7F1", label: "Listo para cargar" },
-  advertencia: { icon: AlertTriangle, color: "#C2542B", bg: "#FBEAE3", label: "Con advertencia" },
+  ok: { icon: CheckCircle2, color: "#6F8F57", bg: "#E7EDDF", label: "Listo para cargar" },
+  advertencia: { icon: AlertTriangle, color: "#A8402E", bg: "#F5E0D9", label: "Con advertencia" },
   error: { icon: XCircle, color: "#B3261E", bg: "#FBEAEA", label: "No se puede cargar" },
-  duplicado: { icon: Copy, color: "#7A8B84", bg: "#EEF2F0", label: "Ya existe" },
+  duplicado: { icon: Copy, color: "#8A7A6E", bg: "#F1E7DA", label: "Ya existe" },
 };
 
 export default function ImportarClientes() {
@@ -77,10 +77,10 @@ export default function ImportarClientes() {
 
       {/* Pantalla de éxito final */}
       {resultado && (
-        <div className="bg-white rounded-lg border border-border p-6 text-center">
+        <div className="bg-card rounded-lg border border-border p-6 text-center">
           <PartyPopper className="mx-auto mb-3 text-success" size={40} strokeWidth={1.5} />
           <h2 className="text-lg font-extrabold text-ink">¡Listo!</h2>
-          <p className="text-sm text-[#4B5B54] mt-2">
+          <p className="text-sm text-[#5B4A3D] mt-2">
             Se cargaron <span className="font-bold text-ink">{resultado.creados}</span> clientes
             {resultado.contratosCreados > 0 && (
               <> ({resultado.contratosCreados} con contrato fijo)</>
@@ -103,7 +103,7 @@ export default function ImportarClientes() {
       {!resultado && (
         <>
           {/* Paso 1 */}
-          <div className="bg-white rounded-lg border border-border p-5">
+          <div className="bg-card rounded-lg border border-border p-5">
             <div className="flex items-start gap-3">
               <div className="w-7 h-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0">1</div>
               <div className="flex-1">
@@ -123,7 +123,7 @@ export default function ImportarClientes() {
           </div>
 
           {/* Paso 2 */}
-          <div className="bg-white rounded-lg border border-border p-5">
+          <div className="bg-card rounded-lg border border-border p-5">
             <div className="flex items-start gap-3">
               <div className="w-7 h-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0">2</div>
               <div className="flex-1">
@@ -160,7 +160,7 @@ export default function ImportarClientes() {
 
           {/* Paso 3: vista previa */}
           {preview && (
-            <div className="bg-white rounded-lg border border-border p-5">
+            <div className="bg-card rounded-lg border border-border p-5">
               <div className="flex items-start gap-3 mb-4">
                 <div className="w-7 h-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0">3</div>
                 <div>
@@ -172,7 +172,7 @@ export default function ImportarClientes() {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#E9F7F1] text-success">
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#E7EDDF] text-success">
                   {importables.length} para cargar
                 </span>
                 {noImportables.length > 0 && (
@@ -204,7 +204,7 @@ export default function ImportarClientes() {
                               {info.label}
                             </span>
                             {fila.estado !== "error" && fila.estado !== "duplicado" && (
-                              <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-white/60 text-muted">
+                              <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-card/60 text-muted">
                                 {fila.es_fijo ? `Fijo — ${fila.servicio_resuelto}` : "Eventual"}
                               </span>
                             )}

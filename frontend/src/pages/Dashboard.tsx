@@ -29,9 +29,9 @@ export default function Dashboard() {
             onClick={() => setPeriodo(p.id)}
             className="text-sm font-semibold px-3 py-1.5 rounded-md border transition-colors"
             style={{
-              borderColor: periodo === p.id ? "#0F5C56" : "#E4EAE7",
-              background: periodo === p.id ? "#0F5C56" : "white",
-              color: periodo === p.id ? "white" : "#4B5B54",
+              borderColor: periodo === p.id ? "#BD5A38" : "#E9DCCC",
+              background: periodo === p.id ? "#BD5A38" : "white",
+              color: periodo === p.id ? "white" : "#5B4A3D",
             }}
           >
             {p.label}
@@ -42,8 +42,8 @@ export default function Dashboard() {
       {kpis && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Kpi icon={ClipboardList} label="Trabajos" value={kpis.trabajos_realizados} />
-          <Kpi icon={DollarSign} label="Facturación" value={fmtMoney(kpis.facturacion)} accent="#0F5C56" />
-          <Kpi icon={TrendingUp} label="Ganancia neta" value={fmtMoney(kpis.ganancia_neta)} accent="#2F9E6E" sub={`${kpis.margen_pct.toFixed(0)}% margen`} />
+          <Kpi icon={DollarSign} label="Facturación" value={fmtMoney(kpis.facturacion)} accent="#BD5A38" />
+          <Kpi icon={TrendingUp} label="Ganancia neta" value={fmtMoney(kpis.ganancia_neta)} accent="#6F8F57" sub={`${kpis.margen_pct.toFixed(0)}% margen`} />
           <Kpi icon={Clock} label="Duración promedio" value={`${Math.round(kpis.duracion_promedio_min)} min`} />
         </div>
       )}
@@ -53,19 +53,19 @@ export default function Dashboard() {
           <h3 className="font-bold text-sm text-ink">Eventuales vs. Fijos</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Kpi icon={Users} label="Trabajos eventuales" value={kpis.trabajos_eventuales} />
-            <Kpi icon={Repeat} label="Trabajos fijos" value={kpis.trabajos_fijos} accent="#0F5C56" />
+            <Kpi icon={Repeat} label="Trabajos fijos" value={kpis.trabajos_fijos} accent="#BD5A38" />
             <Kpi
               icon={TrendingUp}
               label="Ingresos recurrentes"
               value={`${kpis.pct_ingresos_fijos.toFixed(0)}%`}
-              accent="#2F9E6E"
+              accent="#6F8F57"
               sub="del total facturado, viene de contratos fijos"
             />
             <Kpi
               icon={XCircle}
               label="Cancelaciones"
               value={kpis.trabajos_cancelados}
-              accent={kpis.trabajos_cancelados > 0 ? "#C2542B" : "#16241F"}
+              accent={kpis.trabajos_cancelados > 0 ? "#A8402E" : "#362A22"}
               sub={
                 kpis.trabajos_programados_periodo > 0
                   ? `${kpis.pct_cancelados.toFixed(0)}% de lo agendado en el período`
@@ -75,7 +75,7 @@ export default function Dashboard() {
           </div>
 
           {(kpis.trabajos_eventuales > 0 || kpis.trabajos_fijos > 0) && (
-            <div className="bg-white rounded-lg border border-border p-4">
+            <div className="bg-card rounded-lg border border-border p-4">
               <h4 className="font-bold text-sm mb-3 text-ink">Facturación y ticket promedio por tipo</h4>
               <div className="space-y-3">
                 <TipoBarRow
@@ -83,14 +83,14 @@ export default function Dashboard() {
                   facturacion={kpis.facturacion_eventual}
                   ticket={kpis.ticket_promedio_eventual}
                   max={Math.max(kpis.facturacion_eventual, kpis.facturacion_fija) || 1}
-                  color="#8CA39A"
+                  color="#B9A997"
                 />
                 <TipoBarRow
                   label="Fijos"
                   facturacion={kpis.facturacion_fija}
                   ticket={kpis.ticket_promedio_fijo}
                   max={Math.max(kpis.facturacion_eventual, kpis.facturacion_fija) || 1}
-                  color="#0F5C56"
+                  color="#BD5A38"
                 />
               </div>
             </div>
@@ -99,17 +99,17 @@ export default function Dashboard() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-3 bg-white rounded-lg border border-border p-4">
+        <div className="lg:col-span-3 bg-card rounded-lg border border-border p-4">
           <h3 className="font-bold text-sm mb-3 text-ink">Facturación por tipo de servicio</h3>
           {!porServicio || porServicio.length === 0 ? (
             <EmptyChart />
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={porServicio}>
-                <CartesianGrid stroke="#EEF2F0" vertical={false} />
-                <XAxis dataKey="servicio" tick={{ fontSize: 10, fill: "#8CA39A" }} axisLine={{ stroke: "#DCE3DF" }} tickLine={false} interval={0} angle={-15} textAnchor="end" height={60} />
-                <YAxis tick={{ fontSize: 11, fill: "#8CA39A" }} axisLine={false} tickLine={false} width={40} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
-                <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "#E4EAE7" }} />
+                <CartesianGrid stroke="#F1E7DA" vertical={false} />
+                <XAxis dataKey="servicio" tick={{ fontSize: 10, fill: "#B9A997" }} axisLine={{ stroke: "#E9DCCC" }} tickLine={false} interval={0} angle={-15} textAnchor="end" height={60} />
+                <YAxis tick={{ fontSize: 11, fill: "#B9A997" }} axisLine={false} tickLine={false} width={40} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
+                <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "#E9DCCC" }} />
                 <Bar dataKey="facturacion" radius={[4, 4, 0, 0]}>
                   {porServicio.map((s, i) => <Cell key={i} fill={s.color} />)}
                 </Bar>
@@ -118,7 +118,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-lg border border-border p-4">
+        <div className="lg:col-span-2 bg-card rounded-lg border border-border p-4">
           <h3 className="font-bold text-sm mb-3 text-ink">Distribución por servicio</h3>
           {!porServicio || porServicio.length === 0 ? (
             <EmptyChart />
@@ -128,14 +128,14 @@ export default function Dashboard() {
                 <Pie data={porServicio} dataKey="facturacion" nameKey="servicio" innerRadius={45} outerRadius={80} paddingAngle={2}>
                   {porServicio.map((s, i) => <Cell key={i} fill={s.color} />)}
                 </Pie>
-                <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "#E4EAE7" }} />
+                <Tooltip formatter={(v) => fmtMoney(Number(v))} contentStyle={{ fontSize: 12, borderRadius: 8, borderColor: "#E9DCCC" }} />
               </PieChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-border p-4">
+      <div className="bg-card rounded-lg border border-border p-4">
         <h3 className="font-bold text-sm mb-3 text-ink">Rendimiento por técnico</h3>
         {!porTecnico || porTecnico.length === 0 ? (
           <EmptyChart />
@@ -144,13 +144,13 @@ export default function Dashboard() {
             {porTecnico.map((t) => (
               <div key={t.tecnico} className="flex items-center gap-3">
                 <div className="w-32 text-sm font-semibold shrink-0 text-ink">{t.tecnico}</div>
-                <div className="flex-1 h-2 rounded-full bg-[#EEF2F0]">
+                <div className="flex-1 h-2 rounded-full bg-[#F1E7DA]">
                   <div
                     className="h-2 rounded-full bg-primary"
                     style={{ width: `${Math.min(100, (t.facturacion / (porTecnico[0].facturacion || 1)) * 100)}%` }}
                   />
                 </div>
-                <div className="text-xs mono w-16 text-right text-[#4B5B54]">{t.trabajos} trab.</div>
+                <div className="text-xs mono w-16 text-right text-[#5B4A3D]">{t.trabajos} trab.</div>
                 <div className="text-sm font-semibold w-24 text-right text-ink">{fmtMoney(t.facturacion)}</div>
               </div>
             ))}
@@ -173,7 +173,7 @@ function TipoBarRow({
   return (
     <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
       <div className="w-20 text-sm font-semibold shrink-0 text-ink">{label}</div>
-      <div className="flex-1 min-w-[80px] h-2 rounded-full bg-[#EEF2F0]">
+      <div className="flex-1 min-w-[80px] h-2 rounded-full bg-[#F1E7DA]">
         <div
           className="h-2 rounded-full transition-all"
           style={{ width: `${Math.min(100, (facturacion / max) * 100)}%`, background: color }}

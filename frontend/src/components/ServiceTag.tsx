@@ -1,6 +1,6 @@
 export default function ServiceTag({ nombre, color }: { nombre: string | null; color: string | null }) {
   if (!nombre) return null;
-  const c = color || "#0F5C56";
+  const c = color || "#BD5A38";
   return (
     <span
       className="inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"

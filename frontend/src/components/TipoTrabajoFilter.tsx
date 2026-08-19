@@ -19,12 +19,11 @@ export default function TipoTrabajoFilter({
         <button
           key={o.id}
           onClick={() => onChange(o.id)}
-          className="text-sm font-semibold px-3 py-1.5 rounded-md border transition-colors"
-          style={{
-            borderColor: value === o.id ? "#0F5C56" : "#E4EAE7",
-            background: value === o.id ? "#0F5C56" : "white",
-            color: value === o.id ? "white" : "#4B5B54",
-          }}
+          className={`text-sm font-semibold px-3 py-1.5 rounded-md border transition-colors ${
+            value === o.id
+              ? "bg-primary border-primary text-white"
+              : "bg-card border-border text-ink-soft hover:bg-surface-alt"
+          }`}
         >
           {o.label}
         </button>
