@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Search, AlertTriangle, Users } from "lucide-react";
+import { Search, AlertTriangle, Users, Upload } from "lucide-react";
 import { clientesApi } from "../api/clientes";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
@@ -34,14 +34,22 @@ export default function Clientes() {
         </div>
       )}
 
-      <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
-        <input
-          className="w-full pl-9 pr-3 py-2.5 text-sm rounded-md border border-border outline-none focus:ring-2 focus:ring-primary/30"
-          placeholder="Buscar cliente por nombre…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+          <input
+            className="w-full pl-9 pr-3 py-2.5 text-sm rounded-md border border-border outline-none focus:ring-2 focus:ring-primary/30"
+            placeholder="Buscar cliente por nombre…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </div>
+        <Link
+          to="/clientes/importar"
+          className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-md border border-border text-primary hover:bg-primary/5 transition-colors shrink-0"
+        >
+          <Upload size={15} /> <span className="hidden sm:inline">Importar Excel</span>
+        </Link>
       </div>
 
       {isLoading ? (

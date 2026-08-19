@@ -15,6 +15,12 @@ FRONTEND_LOG="/tmp/saniflow-frontend.log"
 echo "==> Levantando PostgreSQL..."
 service postgresql start > /dev/null
 
+echo "==> Verificando que no haya procesos colgados de una sesión anterior..."
+pkill -9 -f "uvicorn app.main:app" 2>/dev/null || true
+pkill -9 -f "vite" 2>/dev/null || true
+pkill -9 -f "node.*vite" 2>/dev/null || true
+sleep 1
+
 if [ ! -d "$BACKEND/.venv" ]; then
   echo "No encontré $BACKEND/.venv — hace falta crear el entorno virtual del"
   echo "backend una vez a mano (ver backend/README.md) antes de usar este script."
@@ -51,11 +57,20 @@ echo "==> Levantando frontend..."
 ) > "$FRONTEND_LOG" 2>&1 &
 FRONTEND_PID=$!
 
+CLEANED_UP=0
 cleanup() {
+  if [ "$CLEANED_UP" = "1" ]; then
+    return
+  fi
+  CLEANED_UP=1
   echo ""
   echo "==> Cortando backend y frontend..."
-  kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null
-  wait "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null
+  kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
+  sleep 1
+  # Red de seguridad: uvicorn --reload y npm run dev pueden dejar procesos
+  # hijos que el kill de arriba no siempre alcanza a matar.
+  pkill -9 -f "uvicorn app.main:app" 2>/dev/null || true
+  pkill -9 -f "vite" 2>/dev/null || true
   echo "Listo."
 }
 trap cleanup EXIT INT TERM

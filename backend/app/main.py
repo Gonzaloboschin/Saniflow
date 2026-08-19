@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.routers import clientes, servicios, tecnicos, contratos, trabajos, interacciones, dashboard
+from app.api.routers import clientes, servicios, tecnicos, contratos, trabajos, interacciones, dashboard, importacion
 
 app = FastAPI(
     title=settings.app_name,
@@ -25,6 +25,7 @@ app.include_router(contratos.router)
 app.include_router(trabajos.router)
 app.include_router(interacciones.router)
 app.include_router(dashboard.router)
+app.include_router(importacion.router)
 
 
 @app.get("/health", tags=["sistema"])
