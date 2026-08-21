@@ -1,8 +1,15 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.routers import clientes, servicios, tecnicos, contratos, trabajos, interacciones, dashboard, importacion
+
+# Sin esto, los logger.info()/logger.exception() de los servicios (ej.
+# notificaciones_service) quedan silenciados — Python no muestra nada por
+# debajo de WARNING si nadie configura el logging al arrancar.
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
 app = FastAPI(
     title=settings.app_name,

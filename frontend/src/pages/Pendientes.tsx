@@ -3,7 +3,8 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Clock, User, CheckCircle2, X, Plus, AlertTriangle, CalendarDays, ClipboardList } from "lucide-react";
 import { trabajosApi, type TrabajoCreatePayload, type TrabajoCompletarPayload } from "../api/trabajos";
 import { clientesApi } from "../api/clientes";
-import { serviciosApi, tecnicosApi } from "../api/servicios";
+import { serviciosApi } from "../api/servicios";
+import { tecnicosApi } from "../api/tecnicos";
 import { contratosApi } from "../api/contratos";
 import type { Trabajo } from "../types";
 import ServiceTag from "../components/ServiceTag";
@@ -167,7 +168,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
   const { data: clientes } = useQuery({ queryKey: ["clientes"], queryFn: () => clientesApi.listar() });
   const { data: servicios } = useQuery({ queryKey: ["servicios"], queryFn: () => serviciosApi.listar() });
-  const { data: tecnicos } = useQuery({ queryKey: ["tecnicos"], queryFn: () => tecnicosApi.listar() });
+  const { data: tecnicos } = useQuery({ queryKey: ["tecnicos", "activos"], queryFn: () => tecnicosApi.listar(true) });
 
   const [form, setForm] = useState<TrabajoCreatePayload>({
     cliente_id: 0, servicio_id: 0, fecha_programada: hoyISO(), hora_programada: "09:00", prioridad: "normal",

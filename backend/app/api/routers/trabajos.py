@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -8,7 +8,7 @@ from app.api.deps import not_found
 from app.models.trabajo import EstadoTrabajo
 from app.schemas.trabajo import TrabajoOut, TrabajoCreate, TrabajoUpdate, TrabajoCompletar
 from app import crud
-from app.services import trabajos_service
+from app.services import trabajos_service, notificaciones_service
 
 router = APIRouter(prefix="/trabajos", tags=["trabajos"])
 
@@ -41,9 +41,11 @@ def listar(
 
 
 @router.post("", response_model=TrabajoOut, status_code=201)
-def crear(data: TrabajoCreate, db: Session = Depends(get_db)):
+def crear(data: TrabajoCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     trabajo = crud.trabajo.create(db, data)
-    return _a_out(crud.trabajo.get(db, trabajo.id))
+    trabajo_completo = crud.trabajo.get(db, trabajo.id)
+    notificaciones_service.notificar_nuevo_trabajo_en_segundo_plano(background_tasks, trabajo_completo)
+    return _a_out(trabajo_completo)
 
 
 @router.get("/{trabajo_id}", response_model=TrabajoOut)

@@ -5,6 +5,7 @@ import Realizados from "./pages/Realizados";
 import Clientes from "./pages/Clientes";
 import ClienteDetalle from "./pages/ClienteDetalle";
 import ImportarClientes from "./pages/ImportarClientes";
+import Operarios from "./pages/Operarios";
 import Dashboard from "./pages/Dashboard";
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="clientes" element={<Clientes />} />
         <Route path="clientes/importar" element={<ImportarClientes />} />
         <Route path="clientes/:id" element={<ClienteDetalle />} />
+        <Route path="operarios" element={<Operarios />} />
         <Route path="dashboard" element={<Dashboard />} />
       </Route>
     </Routes>

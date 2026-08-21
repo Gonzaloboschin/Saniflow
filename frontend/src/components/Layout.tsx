@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Sparkles, Menu, X, ClipboardList, CheckCircle2, Users, BarChart3 } from "lucide-react";
+import { Sparkles, Menu, X, ClipboardList, CheckCircle2, Users, BarChart3, Wrench } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { trabajosApi } from "../api/trabajos";
 
@@ -8,6 +8,7 @@ const NAV = [
   { to: "/", label: "Pendientes", end: true, icon: ClipboardList },
   { to: "/realizados", label: "Realizados", icon: CheckCircle2 },
   { to: "/clientes", label: "Clientes", icon: Users },
+  { to: "/operarios", label: "Operarios", icon: Wrench },
   { to: "/dashboard", label: "Estadísticas", icon: BarChart3 },
 ];
 
@@ -15,6 +16,7 @@ const TITULOS: Record<string, string> = {
   "/": "Pendientes",
   "/realizados": "Trabajos realizados",
   "/clientes": "Clientes",
+  "/operarios": "Operarios",
   "/dashboard": "Estadísticas",
 };
 
